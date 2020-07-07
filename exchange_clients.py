@@ -1,25 +1,32 @@
-
 from client import Client
+import pandas as pd
 import json
 import time
+
+frame = pd.DataFrame()
+minutes_passed = []
 
 class Binance_client(Client):
     def __init__(self, url, exchange, lock):
         super().__init__(url, exchange)
-
         self.lock = lock
 
     def on_message(self, message):
-        quote = json.loads(message)
-        print({
-            "timestamp": int(time.time()),
-            "exchange": self.exchange,
-            "market": quote['s'],
-            "bid_price": quote['b'],
-            "bid_size": quote['B'],
-            "ask_price": quote['a'],
-            "ask_size": quote['A'],
-        })
+        global minutes_passed, frame
+        data = json.loads(message)
+        # print({
+        #     "timestamp": int(time.time()),
+        #     "exchange": self.exchange,
+        #     "market": quote['s'],
+        #     "bid_price": quote['b'],
+        #     "bid_size": quote['B'],
+        #     "ask_price": quote['a'],
+        #     "ask_size": quote['A'],
+        # })
+
+        frame = frame.append(data, ignore_index=True)
+        print(frame)
+
 
 class Bitmex_client(Client):
     def __init__(self, url, exchange, lock):
@@ -27,7 +34,6 @@ class Bitmex_client(Client):
 
         self.lock = lock
         self.exchange = exchange
-
 
     def on_open(self):
         super().on_open()
@@ -37,7 +43,6 @@ class Bitmex_client(Client):
                 "quote:XBTUSD"
             ]
         }
-
         self.ws.send(json.dumps(payload))
 
     def on_message(self, message):

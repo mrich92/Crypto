@@ -1,7 +1,6 @@
 from exchange_clients import *
 import threading
 
-
 # urls..
 binance_url = "wss://fstream.binance.com/ws/btcusdt@bookTicker"
 ftx_url = "wss://ftx.com/ws/"
@@ -20,12 +19,13 @@ bitmex = Bitmex_client(url=bitmex_url, exchange='bitmex',lock=lock)
 # exchange_list = [binance, ftx, bitmex]
 # for connection in exchange_list:
 #     connection.start()
+#
+# bitmex.start()
+# binance.start()
+# ftx.start()
 
-bitmex.start()
+
 binance.start()
-ftx.start()
-
-
 
 
 
