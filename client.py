@@ -1,9 +1,6 @@
 import websocket
 import threading
 
-from json import loads
-
-
 class Client(threading.Thread):
     def __init__(self, url, exchange):
         super().__init__()

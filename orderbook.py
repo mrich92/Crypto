@@ -1,8 +1,20 @@
-import requests
-from exchange_clients import Binance_client
+from client import Client
+import json
+import pandas as pd
 
 
-class OrderBook():
-    def __init__(self):
-        self.ws_client = Binance_client()
-        self.api_client = ''        # Add api call
+
+class OrderBook_client(Client):
+    def __init__(self, url, exchange, lock):
+        super().__init__(url, exchange)
+        self.lock = lock
+        self.exchange = exchange
+        self.DATA_DF = pd.DataFrame()
+
+
+    def on_message(self, message):
+        pass
+
+
+
+
