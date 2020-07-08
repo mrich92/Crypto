@@ -1,0 +1,29 @@
+1. Part one I began by making each of the ws a client class. I then
+initiate all clients with a some threading and converted them into dictionaries.
+See part 1 in main.py.
+
+2. This step I begin caching all the data filtered by seconds and begin
+counting until 1 hour has passed. Then the code continues and adds every
+mid price to the dict from step 1.
+Although it takes an hour to cache enough data for  the 1 hour mid price,,
+it continues working as usual but with the additional information.
+See part 2 in main.py
+
+3. Same process as above just with some new data.
+See part 2 main.py
+
+4.The new information shows more about how much of the volume is maker or taker.
+The book offers to show where the limit orders are waiting for a taker to jump
+in and take the liquidity from the market. This is important information if one wishes
+to know the highest likely incoming price movements. Additionally it gives insight on
+big market players that can influence price movements also.
+
+To make it better; One could monitor the trade id's to keep track of the most up to date
+book.]
+
+5. See part 5 main.py
+
+6. The more incoming data, the more time it takes to process each tick or trade
+message; therefore upping the latency.
+
+

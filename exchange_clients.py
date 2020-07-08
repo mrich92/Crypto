@@ -3,7 +3,7 @@ import json
 import time
 
 #  Binance cahce
-binace_seconds_passed = {}
+binance_seconds_passed = {}
 binance_cache = []
 
 # Bitmex cache
@@ -20,7 +20,7 @@ class Binance_client(Client):
         self.lock = lock
 
     def on_message(self, message):
-        global binance_seconds_passed, binance_cachecache
+        global binance_seconds_passed, binance_cache
         data = json.loads(message)
         data = {
             "timestamp": int(time.time()),
@@ -32,16 +32,16 @@ class Binance_client(Client):
             "ask_size": float(data['A']),
         }
 
-        if not data['timestamp'] in binace_seconds_passed:
+        if not data['timestamp'] in binance_seconds_passed:
             binance_seconds_passed[data['timestamp']] = True
             binance_cache.append(data)
             print(binance_cache[-1])
 
-        if len(binace_seconds_passed) >= 3600:                     # 3600 seconds == 1 hour..
+        if len(binance_seconds_passed) >= 3600:                     # 3600 seconds == 1 hour..
             val = binance_cache.pop(0)                           # Remove value 3600 seconds ago..
             mid = (val['bid_price']+val['ask_price'])/2     # Compute hour ago mid price
             data.update({"mid_price_1H": mid})
-            print(data)
+        print(data)
 
 
 class Bitmex_client(Client):
@@ -126,7 +126,7 @@ class Ftx_client(Client):
             print(data)
 
 
-class OrderBook_client(Client):
+class Trades_client(Client):
     def __init__(self, url, exchange, lock):
         super().__init__(url, exchange)
         self.lock = lock
@@ -134,4 +134,16 @@ class OrderBook_client(Client):
 
 
     def on_message(self, message):
-        pass
+        data = json.loads(message)
+        data = {
+            "timestamp": data['data']['E'],
+            "exchange": self.exchange,
+            "market": data['data']['s'],
+            "price": float(data['data']['p']),
+            "quantity": float(data['data']['q']),
+            "first_id": int(data['data']['f']),
+            "last_id": int(data['data']['l']),
+            "maker": bool(data['data']['m'])
+        }
+
+        print(data)
