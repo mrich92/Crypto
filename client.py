@@ -36,3 +36,4 @@ class Client(threading.Thread):
     # run when websocket is initialised
     def on_open(self):
         print(f'Connected to {self.exchange}\n')
+

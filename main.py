@@ -1,7 +1,5 @@
 from exchange_clients import *
 import threading
-from orderbook import OrderBook_client
-
 
 # urls..
 binance_url = "wss://fstream.binance.com/ws/btcusdt@bookTicker"
@@ -26,12 +24,9 @@ bitmex = Bitmex_client(url=bitmex_url, exchange='bitmex',lock=lock)
 
 
 # Program start
-# orderbook.start()
+ftx.start()
+bitmex.start()
 binance.start()
-
-# ftx.start()
-# bitmex.start()
-# main.start()
 
 
 

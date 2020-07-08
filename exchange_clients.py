@@ -1,12 +1,18 @@
 from client import Client
-import pandas as pd
-from orderbook import OrderBook_client
 import json
 import time
 
-DATA_DF = pd.DataFrame()
-seconds_passed = {}
-second_counter = 0
+#  Binance cahce
+binace_seconds_passed = {}
+binance_cache = []
+
+# Bitmex cache
+bitmex_seconds_passed = {}
+bitmex_cache = []
+
+#  Ftx cache
+ftx_seconds_passed = {}
+ftx_cache = []
 
 class Binance_client(Client):
     def __init__(self, url, exchange, lock):
@@ -14,7 +20,7 @@ class Binance_client(Client):
         self.lock = lock
 
     def on_message(self, message):
-        global DATA_DF, seconds_passed, second_counter
+        global binance_seconds_passed, binance_cachecache
         data = json.loads(message)
         data = {
             "timestamp": int(time.time()),
@@ -24,21 +30,18 @@ class Binance_client(Client):
             "bid_size": float(data['B']),
             "ask_price": float(data['a']),
             "ask_size": float(data['A']),
-            # "mid_price_1hour": (float(data['b'])+float(data['a'])) /2
         }
 
-        if not data['timestamp'] in seconds_passed:
-            seconds_passed[data['timestamp']] = True
-            DATA_DF = DATA_DF.append(data, ignore_index=True)
-            # DATA_DF = DATA_DF.set_index('timestamp')
-            print(DATA_DF)
+        if not data['timestamp'] in binace_seconds_passed:
+            binance_seconds_passed[data['timestamp']] = True
+            binance_cache.append(data)
+            print(binance_cache[-1])
 
-        if len(seconds_passed) >= 3:
-            # val = (df.iloc[0]['bid_price']+df.iloc[0]['ask_price'])/2
-            val = (DATA_DF.iloc[0]['bid_price']+DATA_DF.iloc[0]['ask_price'])/2
-            DATA_DF = DATA_DF.iloc[0:]
-            # data.update({"1_hour_midprice": val)
-
+        if len(binace_seconds_passed) >= 3600:                     # 3600 seconds == 1 hour..
+            val = binance_cache.pop(0)                           # Remove value 3600 seconds ago..
+            mid = (val['bid_price']+val['ask_price'])/2     # Compute hour ago mid price
+            data.update({"mid_price_1H": mid})
+            print(data)
 
 
 class Bitmex_client(Client):
@@ -59,7 +62,8 @@ class Bitmex_client(Client):
         self.ws.send(json.dumps(payload))
 
     def on_message(self, message):
-        global DATA_DF
+        global bitmex_seconds_passed, bitmex_cache
+
         # Load message into dict
         data = json.loads(message)
         data = {
@@ -71,9 +75,17 @@ class Bitmex_client(Client):
             'ask': data['data'][-1]['askPrice'],
             'askSize': data['data'][-1]['askSize']
         }
-        # Write to main dataframe
-        # with self.lock:
-        #     DATA_DF = DATA_DF.append(data, ignore_index=True)
+        if not data['timestamp'] in bitmex_seconds_passed:
+            bitmex_seconds_passed[data['timestamp']] = True
+            bitmex_cache.append(data)
+            print(bitmex_cache[-1])
+
+        if len(bitmex_seconds_passed) >= 3600:                     # 3600 seconds == 1 hour..
+            val = bitmex_cache.pop(0)                           # Remove value 3600 seconds ago..
+            mid = (val['bid_price']+val['ask_price'])/2     # Compute hour ago mid price
+            data.update({"mid_price_1H": mid})
+            print(data)
+
 
 class Ftx_client(Client):
     def __init__(self, url, exchange, lock):
@@ -90,7 +102,8 @@ class Ftx_client(Client):
         self.ws.send(message)
 
     def on_message(self, message):
-        global DATA_DF
+        global ftx_seconds_passed, ftx_cache
+
         data = json.loads(message)
         data = {
             "timestamp": int(data['data']['time']),
@@ -101,8 +114,24 @@ class Ftx_client(Client):
             "ask_price": data['data']['ask'],
             "ask_size": data['data']['askSize'],
         }
+        if not data['timestamp'] in ftx_seconds_passed:
+            ftx_seconds_passed[data['timestamp']] = True
+            ftx_cache.append(data)
+            print(ftx_cache[-1])
 
-        # Write to main dataframe
-        # with self.lock:
-        #     DATA_DF = DATA_DF.append(data, ignore_index=True)
+        if len(ftx_seconds_passed) >= 3600:                     # 3600 seconds == 1 hour..
+            val = ftx_cache.pop(0)                           # Remove value 3600 seconds ago..
+            mid = (val['bid_price']+val['ask_price'])/2     # Compute hour ago mid price
+            data.update({"mid_price_1H": mid})
+            print(data)
 
+
+class OrderBook_client(Client):
+    def __init__(self, url, exchange, lock):
+        super().__init__(url, exchange)
+        self.lock = lock
+        self.exchange = exchange
+
+
+    def on_message(self, message):
+        pass
