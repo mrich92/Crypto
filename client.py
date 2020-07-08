@@ -21,19 +21,15 @@ class Client(threading.Thread):
         while True:
             self.ws.run_forever()
 
-    # convert message to dict, process update
     def on_message(self, message):
         pass
 
-    # catch errors
     def on_error(self, error):
         print(error)
 
-    # run when websocket is closed
     def on_close(self):
         print("### closed ###")
 
-    # run when websocket is initialised
     def on_open(self):
         print(f'Connected to {self.exchange}\n')
 

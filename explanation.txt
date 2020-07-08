@@ -27,3 +27,8 @@ book.]
 message; therefore upping the latency.
 
 
+Other notes:
+Only one 3rd party dependency which is
+websocket-client (pip3 install websocket-client).
+Please comment and uncomment per step based on the notes in main.py
+
